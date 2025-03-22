@@ -12,3 +12,46 @@ requires = ["hatchling"]
 
 [tool.hatch.build.targets.wheel]
 packages = ["lynx"]
+
+[dependency-groups]
+dev = [
+    "pyright>=1.1.397",
+    "ruff>=0.11.2",
+]
+
+[tool.pyright]
+exclude = [".venv", ""]
+pythonVersion = "3.10"
+venvPath = "."
+venv = ".venv"
+
+[tool.ruff]
+line-length = 88
+
+[tool.ruff.lint]
+select = [
+    "E",  # pycodestyle errors
+    "W",  # pycodestyle warnings
+    "F",  # pyflakes
+    "I",  # isort
+    "B",  # flake8-bugbear
+    "C4", # flake8-comprehensions
+    "N",  # PEP8 naming conventions
+    "D",  # pydocstyle
+]
+ignore = [
+    "C901",  # too complex
+    "W191",  # indentation contains tabs
+    "D401",  # imperative mood
+    "D100",  # missing docstring in public module
+    "D104",  # missing docstring in public package
+    "B010",  # conflicting with pyright
+    "D102",  # missing docstring in public class
+    "D107",  # missing docstring in public function
+    "D101",  # missing docstring in public function
+    "D103",  # missing docstring in public function
+    "F821",  # undefined name
+]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
