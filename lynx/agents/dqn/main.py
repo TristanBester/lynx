@@ -6,8 +6,8 @@ import jax.numpy as jnp
 from omegaconf import DictConfig, OmegaConf
 from rich.pretty import pprint
 
-from lynx.agents.dqn.learner.setup import setup_learner
 from lynx.agents.dqn.evaluator import setup_evaluator
+from lynx.agents.dqn.learner.setup import setup_learner
 from lynx.envs.factories.factory import make
 
 
@@ -27,9 +27,7 @@ def run_experiment(config):
 
     ##### DEBUG CODE AFTER THIS POINT #####
     steps_per_eval = (
-        config.train.rollout_length
-        * config.train.batch_size
-        * config.train.epochs_per_eval
+        config.train.rollout_length * config.train.envs_per_device * jax.device_count()
     )
 
     for i in range(10):
@@ -59,19 +57,21 @@ def run_experiment(config):
 
         print("Episode statistics:")
         for key, value in episode_statistics.items():
-            print(f"{key}: {jnp.mean(value):2f}")
+            print(f"{key}: {jnp.mean(value):2f} {jnp.max(value):2f}")
 
         start_time = time.time()
         eval_statistics = evaluator(learner_state.params.online, eval_keys)
         jax.block_until_ready(eval_statistics)
         elapsed_time = time.time() - start_time
-        steps_per_eval = int(jnp.sum(eval_statistics["episode_length"]))
-        steps_per_second = steps_per_eval / elapsed_time
+        steps_per_eval_2 = int(jnp.sum(eval_statistics["episode_length"]))
+        steps_per_second = steps_per_eval_2 / elapsed_time
         print()
         print("Eval statistics:")
         print(f"Steps per second: {steps_per_second:2f}")
         for key, value in eval_statistics.items():
-            print(f"{key}: {jnp.mean(value):2f}")
+            print(f"{key}: {jnp.mean(value):2f} {jnp.max(value):.2f}")
+        print("-" * 100)
+        print("-" * 100)
         print("-" * 100)
 
 

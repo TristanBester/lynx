@@ -18,9 +18,10 @@ def create_update_fn(env, apply_fn, update_fn, buffer, config):
         learner_state, traj_batch = jax.lax.scan(
             step_env, learner_state, None, config.train.rollout_length
         )
+        params, opt_state, buffer_state, key, env_states, timesteps = learner_state
+        buffer_state = buffer.add(buffer_state, traj_batch)
 
         # Update the networks
-        params, opt_state, buffer_state, key, env_states, timesteps = learner_state
         update_state = (params, opt_state, buffer_state, key)
         update_state, loss_info = jax.lax.scan(
             update_epoch, update_state, None, config.train.updates_per_epoch

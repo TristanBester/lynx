@@ -22,5 +22,5 @@ class MLPBackbone(nn.Module):
                 layer_size,
                 kernel_init=self.kernel_init,
             )(x)
-            x = nn.relu(x)
+            x = nn.silu(x)
         return x
