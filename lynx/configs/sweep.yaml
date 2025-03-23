@@ -1,0 +1,91 @@
+network:
+  encoder:
+    _target_: lynx.networks.encoder.AgentViewEncoder
+  backbone:
+    _target_: lynx.networks.backbone.MLPBackbone 
+    layer_sizes: [256, 256]
+  head:
+    _target_: lynx.networks.heads.QNetworkHead 
+environment:
+  name: Snake-v1
+  observation_attribute: grid 
+  kwargs:
+    num_rows: 6
+    num_cols: 6 
+  wrappers:
+    _target_: lynx.envs.wrappers.observation.flatten.FlattenObservationWrapper
+experiment:
+  seed: 0
+eval:
+  num_episodes: 128
+train:
+  envs_per_device: 1024  
+  updates_per_device: 1 # Number of gradient updates per device
+  warmup_steps: 100 # Number of environment steps to take before training starts
+  buffer_size: 1_000_000 # Size of the replay buffer 
+  gamma: 0.99 
+  max_grad_norm: 0.5 # Maximum norm of the gradients for a weight update
+  training_epsilon: 0.1 # Epsilon used for training
+  max_abs_reward: 1000.0
+  huber_loss_parameter: 0.0
+sweep:
+  cost: 
+    name: total_timesteps
+    type: log_space
+    min: 100_000
+    max: 10_000_000
+    center: 1_000_000
+    int: true
+  hparams:
+    - name: rollout_length
+      type: linear
+      min: 2 
+      max: 100 
+      center: 5
+      int: true 
+    - name: updates_per_epoch
+      type: linear
+      min: 10
+      max: 1000
+      center: 10
+      int: true
+    - name: batch_size 
+      type: linear
+      min: 32
+      max: 8192  
+      center: 64
+      int: true
+    - name: tau 
+      type: log_space 
+      min: 1e-6
+      max: 1e-3
+      center: 1e-4
+      int: false 
+    - name: learning_rate
+      type: log_space
+      min: 1e-6
+      max: 1e-3
+      center: 1e-4
+      int: false
+    - name: training_epsilon 
+      type: log_space 
+      min: 0.01
+      max: 0.5
+      center: 0.1
+      int: false
+    - name: huber_loss_parameter
+      type: logit 
+      min: 0.0
+      max: 1.0
+      center: 0.1
+      int: false
+
+defaults:  
+  - _self_  
+  - override hydra/hydra_logging: disabled  
+  - override hydra/job_logging: disabled  
+
+hydra:  
+  output_subdir: null  
+  run:  
+    dir: .

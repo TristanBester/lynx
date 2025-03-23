@@ -1,13 +1,12 @@
+import os
 from enum import Enum
 
 import chex
 import jax
 import jax.numpy as jnp
-from dotenv import load_dotenv
-import os
-import wandb
-
 import neptune
+import wandb
+from dotenv import load_dotenv
 
 load_dotenv()
 
@@ -20,7 +19,7 @@ class StatisticType(Enum):
 
 class LogAggregator:
     def __init__(self):
-        self.log_backends = [NeptuneBackend(), WandbBackend()]
+        self.log_backends = [ConsoleBackend()]
         self.summary_statistics = {
             "mean": jnp.mean,
             "max": jnp.max,
@@ -68,7 +67,10 @@ class ConsoleBackend:
         statistics: dict[str, chex.Numeric],
         statistic_type: StatisticType,
     ):
-        pass
+        self._print_type_header(statistic_type)
+        for key, value in statistics.items():
+            print(f"{key}: {value}")
+        print()
 
     def _print_type_header(self, statistic_type: StatisticType):
         print(f"{'-' * 100}")

@@ -3,8 +3,9 @@ name = "lynx"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
-requires-python = ">=3.10,<3.11"
+requires-python = ">=3.11,<3.12"
 dependencies = [
+    "carbs",
     "chex>=0.1.89",
     "distrax>=0.1.5",
     "flashbax>=0.1.2",
@@ -69,3 +70,6 @@ ignore = [
 
 [tool.ruff.lint.pydocstyle]
 convention = "google"
+
+[tool.uv.sources]
+carbs = { git = "https://github.com/imbue-ai/carbs.git" }
