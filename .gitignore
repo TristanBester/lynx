@@ -17,3 +17,6 @@ wheels/
 
 # Wandb
 wandb/
+
+# PyTorch files
+*.pt

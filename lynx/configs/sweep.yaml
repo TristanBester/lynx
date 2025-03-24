@@ -18,8 +18,9 @@ experiment:
   seed: 0
 eval:
   num_episodes: 128
+  desired_steps_per_eval: 10_000
 train:
-  envs_per_device: 1024  
+  envs_per_device: 128
   updates_per_device: 1 # Number of gradient updates per device
   warmup_steps: 100 # Number of environment steps to take before training starts
   buffer_size: 1_000_000 # Size of the replay buffer 
@@ -30,24 +31,24 @@ train:
   huber_loss_parameter: 0.0
 sweep:
   cost: 
-    name: total_timesteps
+    name: total_steps
     type: log_space
-    min: 100_000
-    max: 10_000_000
-    center: 1_000_000
+    min: 50_000
+    max: 1_000_000
+    center: 250_000
     int: true
   hparams:
     - name: rollout_length
       type: linear
       min: 2 
-      max: 100 
-      center: 5
+      max: 1000 
+      center: 100
       int: true 
     - name: updates_per_epoch
       type: linear
       min: 10
-      max: 1000
-      center: 10
+      max: 10000
+      center: 100
       int: true
     - name: batch_size 
       type: linear

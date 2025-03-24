@@ -1,8 +1,9 @@
 experiment:
   seed: 0
-  total_steps: 1e7 # Total number of steps to train for
+  total_steps: 1_000_000 # Total number of steps to train for
 eval:
   num_episodes: 128
+  desired_steps_per_eval: 50_000
 train:
   envs_per_device: 1024  
   updates_per_device: 1 # Number of gradient updates per device

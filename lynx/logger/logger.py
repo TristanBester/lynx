@@ -19,7 +19,7 @@ class StatisticType(Enum):
 
 class LogAggregator:
     def __init__(self):
-        self.log_backends = [ConsoleBackend()]
+        self.log_backends = [WandbBackend()]
         self.summary_statistics = {
             "mean": jnp.mean,
             "max": jnp.max,
@@ -30,12 +30,25 @@ class LogAggregator:
     def log_scalar(self, timestep: int, key: str, value: chex.Numeric):
         pass
 
-    def log_pytree(self, timestep: int, statistics: chex.ArrayTree):
-        pass
+    def log_pytree(
+        self, timestep: int, statistics: chex.ArrayTree, statistic_type: StatisticType
+    ):
+        processed_statistics = {}
+        for key, value in statistics.items():
+            for (
+                summary_statistic_name,
+                summary_statistic_fn,
+            ) in self.summary_statistics.items():
+                name = f"{statistic_type.value}/{key}/{summary_statistic_name}"
+                summary_value = summary_statistic_fn(value)
+                processed_statistics[name] = float(summary_value)
+
+        for backend in self.log_backends:
+            backend.log(timestep, processed_statistics, statistic_type)
 
     def log_pytree_mask(
         self,
-        timestep: chex.Numeric,
+        timestep: int,
         statistics: chex.ArrayTree,
         mask: chex.Array,
         statistic_type: StatisticType,
@@ -43,7 +56,7 @@ class LogAggregator:
         masked_statistics = jax.tree_util.tree_map(lambda x: x[mask], statistics)
 
         # Compile statistics
-        processed_statistics = {"timestep": timestep}
+        processed_statistics = {}
         for key, value in masked_statistics.items():
             for (
                 summary_statistic_name,
@@ -55,7 +68,7 @@ class LogAggregator:
 
         # Log statistics
         for backend in self.log_backends:
-            backend.log(processed_statistics, statistic_type)
+            backend.log(timestep, processed_statistics, statistic_type)
 
     def stop(self):
         pass
@@ -64,6 +77,7 @@ class LogAggregator:
 class ConsoleBackend:
     def log(
         self,
+        timestep: int,
         statistics: dict[str, chex.Numeric],
         statistic_type: StatisticType,
     ):
@@ -85,9 +99,14 @@ class NeptuneBackend:
             api_token=os.getenv("NEPTUNE_API_KEY"),
         )
 
-    def log(self, statistics: dict[str, chex.Numeric], _: StatisticType):
+    def log(
+        self,
+        timestep: int,
+        statistics: dict[str, chex.Numeric],
+        _: StatisticType,
+    ):
         for key, value in statistics.items():
-            self.run[key].append(value)
+            self.run[key].append(value=value, step=timestep)
 
     def stop(self):
         self.run.stop()
@@ -96,14 +115,16 @@ class NeptuneBackend:
 class WandbBackend:
     def __init__(self):
         self.run = wandb.init(
-            project="lynx",
+            project="lynx-tuning",
         )
 
     def log(
         self,
+        timestep: int,
         statistics: dict[str, chex.Numeric],
-        _: StatisticType,
+        statistic_type: StatisticType,
     ):
+        statistics["timestep"] = timestep
         wandb.log(statistics)
 
     def stop(self):
