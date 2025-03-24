@@ -1,3 +1,4 @@
+import copy
 import time
 
 import hydra
@@ -9,8 +10,8 @@ from carbs import (
     LinearSpace,
     LogitSpace,
     LogSpace,
-    Param,
     ObservationInParam,
+    Param,
 )
 from omegaconf import DictConfig, OmegaConf
 from rich.pretty import pprint
@@ -19,7 +20,6 @@ from lynx.agents.dqn.evaluator import setup_evaluator
 from lynx.agents.dqn.learner.setup import setup_learner
 from lynx.envs.factories.factory import make
 from lynx.logger.logger import LogAggregator, StatisticType
-import copy
 
 
 def setup_sweep_params(config: DictConfig):

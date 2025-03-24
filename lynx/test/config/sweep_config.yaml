@@ -1,0 +1,13 @@
+program: lynx/test/trial.py
+project: sweep-test
+method: bayes
+metric:
+  goal: minimize
+  name: loss 
+parameters:
+  x:
+    min: -10
+    max: 10
+  y: 
+    min: -10
+    max: 10
