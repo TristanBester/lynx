@@ -33,10 +33,13 @@ def run_experiment(config):
 
     # Create the checkpointer
     checkpointer = Checkpointer(
-        model_name="dqn-snake",
-        checkpoint_dir=os.path.join(os.getcwd(), "checkpoints"),
-        max_to_keep=5,
-        keep_period=config.dynamic.steps_per_eval,
+        model_name=f"dqn-snake-{config.experiment.seed}",
+        checkpoint_dir=os.path.join(
+            os.getcwd(), f"checkpoints/seed-{config.experiment.seed}"
+        ),
+        max_to_keep=2,
+        # keep_period=config.dynamic.steps_per_eval,
+        keep_period=100_000,  # FIXME: Random number so mod fails and not all stored
     )
 
     timestep = 0
@@ -62,9 +65,6 @@ def run_experiment(config):
                 timestep, "steps_per_second", steps_per_second, StatisticType.TRAIN
             )
 
-            # TODO: REMOVE
-            break
-
         print("Evaluation started...")
         start_time = time.time()
         eval_statistics = evaluator(learner_state.params.online, eval_keys)
@@ -88,7 +88,7 @@ def run_experiment(config):
 
 
 @hydra.main(
-    config_path="/Users/tristan/Projects/lynx/lynx/configs",
+    config_path="../../configs/",
     config_name="dqn-tuned.yaml",
     version_base="1.2",
 )

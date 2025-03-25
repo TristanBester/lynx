@@ -104,6 +104,8 @@ class WandbBackend:
     def __init__(self, project_name: str | None = None):
         self.run = wandb.init(
             project=project_name,
+            tags=["dqn", "cpu"],
+            group="dqn",
         )
 
     def log(
