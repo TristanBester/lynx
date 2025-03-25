@@ -1,7 +1,0 @@
-partition: bigbatch
-time_limit: "72:00:00"
-job_name: snake-sweep
-remote_project_dir: /home-mscluster/tbester/lynx
-entity: tristanbester1
-node_count: 2
-agents_per_node: 4
