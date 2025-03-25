@@ -335,7 +335,7 @@ source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "absl-py" },
     { name = "attrs" },
-    { name = "numpy" },
+    { name = "numpy", marker = "python_full_version == '3.11.*'" },
     { name = "wrapt" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/a6/83/ce29720ccf934c6cfa9b9c95ebbe96558386e66886626066632b5e44afed/dm_tree-0.1.9.tar.gz", hash = "sha256:a4c7db3d3935a5a2d5e4b383fc26c6b0cd6f78c6d4605d3e7b518800ecd5342b", size = 35623 }
@@ -715,6 +715,7 @@ dependencies = [
     { name = "jax" },
     { name = "jinja2" },
     { name = "jumanji" },
+    { name = "orbax-checkpoint" },
     { name = "python-dotenv" },
     { name = "rich" },
     { name = "rlax" },
@@ -740,6 +741,7 @@ requires-dist = [
     { name = "jax", specifier = ">=0.5.3" },
     { name = "jinja2", specifier = ">=3.1.6" },
     { name = "jumanji", specifier = ">=1.1.0" },
+    { name = "orbax-checkpoint", specifier = ">=0.11.10" },
     { name = "python-dotenv", specifier = ">=1.0.1" },
     { name = "rich", specifier = ">=13.9.4" },
     { name = "rlax", specifier = ">=0.1.6" },
@@ -824,7 +826,7 @@ name = "ml-dtypes"
 version = "0.5.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "numpy" },
+    { name = "numpy", marker = "python_full_version == '3.11.*'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/32/49/6e67c334872d2c114df3020e579f3718c333198f8312290e09ec0216703a/ml_dtypes-0.5.1.tar.gz", hash = "sha256:ac5b58559bb84a95848ed6984eb8013249f90b6bab62aa5acbad876e256002c9", size = 698772 }
 wheels = [

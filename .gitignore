@@ -18,5 +18,6 @@ wheels/
 # Wandb
 wandb/
 
-# PyTorch files
-*.pt
+# Checkpoints
+checkpoints/
+

@@ -3,9 +3,8 @@ from enum import Enum
 import chex
 import jax
 import jax.numpy as jnp
-from dotenv import load_dotenv
-
 import wandb
+from dotenv import load_dotenv
 
 load_dotenv()
 
@@ -26,8 +25,18 @@ class LogAggregator:
             "std": jnp.std,
         }
 
-    def log_scalar(self, timestep: int, key: str, value: chex.Numeric):
-        pass
+    def log_scalar(
+        self,
+        timestep: int,
+        key: str,
+        value: chex.Numeric,
+        statistic_type: StatisticType,
+    ):
+        name = f"{statistic_type.value}/{key}"
+        processed_statistics = {name: value}
+
+        for backend in self.log_backends:
+            backend.log(timestep, processed_statistics, statistic_type)
 
     def log_pytree(
         self, timestep: int, statistics: chex.ArrayTree, statistic_type: StatisticType
