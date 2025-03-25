@@ -12,7 +12,3 @@ cp /home-mscluster/tbester/lynx/lynx/exp/batch_script.sh .
 
 # Start the agents 
 sbatch batch_script.sh 0
-sbatch batch_script.sh 1
-sbatch batch_script.sh 2
-sbatch batch_script.sh 3
-sbatch batch_script.sh 4

@@ -1,16 +1,13 @@
 #!/bin/bash
-# specify a partition
-#SBATCH -p bigbatch 
-# specify number of nodes
-#SBATCH -N 1
-# specify the wall clock time limit for the job hh:mm:ss
-#SBATCH -t 72:00:00 
-# specify the job name
-#SBATCH -J snake-exp
-# specify the filename to be used for writing output
-#SBATCH -o /home-mscluster/tbester/lynx/slurm_logs/out/out_file.%N.%j.out
-# specify the filename for stderr
-#SBATCH -e /home-mscluster/tbester/lynx/slurm_logs/err/error_file.%N.%j.err
+#SBATCH --partition=bigbatch 
+#SBATCH --nodes=1
+#SBATCH --time=72:00:00 
+#SBATCH --job-name=snake-exp
+#SBATCH --output=/home-mscluster/tbester/lynx/slurm_logs/out/out_file.%N.%j.out
+#SBATCH --error=/home-mscluster/tbester/lynx/slurm_logs/err/error_file.%N.%j.err
+#SBATCH --array=0-99%5 
+#SBATCH --exclusive # Use the whole node exclusively
+
 
 # Get the hostname of the current machine
 HOSTNAME=$(hostname)
@@ -26,6 +23,7 @@ cd "/home-mscluster/tbester/lynx"
 uv sync
 source .venv/bin/activate
 
+# FIXME: The relationship here between seed count and agents per node makes no sense
 # Run multiple W&B agents in parallel
-uv run lynx/agents/dqn/exp.py experiment.seed=$(( $1 + 0 )) &
+uv run lynx/agents/dqn/exp.py experiment.seed=$(( ${SLURM_ARRAY_TASK_ID} + 0 )) &
 wait;

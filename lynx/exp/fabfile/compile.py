@@ -31,6 +31,8 @@ def _compile_batch_script():
         "job_name": job_config["job_name"],
         "experiment_script": job_config["experiment_script"],
         "remote_project_dir": job_config["remote_project_dir"],
+        "seed_count": job_config["seed_count"],
+        "concurrency_limit": job_config["concurrency_limit"],
         "agents_per_node": job_config["agents_per_node"],
     }
 
