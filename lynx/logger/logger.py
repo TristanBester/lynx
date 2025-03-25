@@ -1,12 +1,11 @@
-import os
 from enum import Enum
 
 import chex
 import jax
 import jax.numpy as jnp
-import neptune
-import wandb
 from dotenv import load_dotenv
+
+import wandb
 
 load_dotenv()
 
@@ -18,8 +17,8 @@ class StatisticType(Enum):
 
 
 class LogAggregator:
-    def __init__(self):
-        self.log_backends = [WandbBackend()]
+    def __init__(self, project_name: str | None = None):
+        self.log_backends = [WandbBackend(project_name=project_name)]
         self.summary_statistics = {
             "mean": jnp.mean,
             "max": jnp.max,
@@ -92,30 +91,10 @@ class ConsoleBackend:
         print(f"{'-' * 100}")
 
 
-class NeptuneBackend:
-    def __init__(self):
-        self.run = neptune.init_run(
-            project="tristanbester/SnakeAI",
-            api_token=os.getenv("NEPTUNE_API_KEY"),
-        )
-
-    def log(
-        self,
-        timestep: int,
-        statistics: dict[str, chex.Numeric],
-        _: StatisticType,
-    ):
-        for key, value in statistics.items():
-            self.run[key].append(value=value, step=timestep)
-
-    def stop(self):
-        self.run.stop()
-
-
 class WandbBackend:
-    def __init__(self):
+    def __init__(self, project_name: str | None = None):
         self.run = wandb.init(
-            project="lynx-tuning",
+            project=project_name,
         )
 
     def log(
