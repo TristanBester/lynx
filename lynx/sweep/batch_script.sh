@@ -27,6 +27,5 @@ uv sync
 source .venv/bin/activate
 
 # Run multiple W&B agents in parallel
-wandb agent tristanbester1/snake-sweep/0d8k0c8o &
-wandb agent tristanbester1/snake-sweep/0d8k0c8o &
+wandb agent tristanbester1/snake-sweep/u9swd5p9 &
 wait;

@@ -3,12 +3,12 @@ project: snake-sweep
 method: bayes
 metric:
   goal: maximize 
-  name: eval/episode_return/mean 
+  name: train/episode_return/mean 
 parameters:
   rollout_length:
     distribution: int_uniform
-    min: 2
-    max: 100
+    min: 10
+    max: 11
   updates_per_epoch:
     distribution: int_uniform
     min: 10
@@ -33,6 +33,12 @@ parameters:
     distribution: uniform 
     min: 0.0
     max: 1.0
+early_terminate:
+  type: hyperband
+  min_iter: 1
+  s: 2 # Number of brackets
+  eta: 10 # Only 1/eta runs survive at each halving stage (lower more aggressive pruning)
+  strict: true # follot paper implementation (more aggressive)
 command:
   - ${interpreter}
   - ${program}

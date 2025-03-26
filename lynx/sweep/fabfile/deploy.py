@@ -3,7 +3,7 @@ import os
 from dotenv import load_dotenv
 from fabric import Connection, task
 
-from lynx.test.logger import get_logger
+from lynx.sweep.logger import get_logger
 
 load_dotenv()
 logger = get_logger()
