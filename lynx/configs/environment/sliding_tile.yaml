@@ -1,0 +1,9 @@
+  name: SlidingTilePuzzle-v0
+  observation_attributes:
+    - puzzle
+    - empty_tile_position
+  kwargs:
+    num_rows: 6
+    num_cols: 6 
+  wrappers:
+    _target_: lynx.envs.wrappers.observation.flatten.FlattenObservationWrapper

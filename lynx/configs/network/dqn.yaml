@@ -1,0 +1,7 @@
+encoder:
+  _target_: lynx.networks.encoder.AgentViewEncoder
+backbone:
+  _target_: lynx.networks.backbone.MLPBackbone 
+  layer_sizes: [256, 256]
+head:
+  _target_: lynx.networks.heads.QNetworkHead 

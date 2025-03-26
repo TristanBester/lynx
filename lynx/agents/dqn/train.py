@@ -9,7 +9,7 @@ from rich.pretty import pprint
 from lynx.agents.dqn.evaluator import setup_evaluator
 from lynx.agents.dqn.learner.setup import setup_learner
 from lynx.envs.factories.factory import make
-from lynx.logger.logger import LogAggregator, StatisticType
+# from lynx.logger.logger import LogAggregator, StatisticType
 
 
 def run_experiment(config):
@@ -59,67 +59,9 @@ def run_experiment(config):
 
         logger.log_pytree(timestep, eval_statistics, StatisticType.EVAL)
 
-    # ##### DEBUG CODE AFTER THIS POINT #####
-    #
-    #
-    # steps_per_eval = (
-    #     config.train.rollout_length * config.train.envs_per_device * jax.device_count()
-    # )
-
-    # for i in range(10):
-    #     start_time = time.time()
-    #     learner_state, episode_statistics, training_statistics = learn_fn(learner_state)
-    #     jax.block_until_ready(learner_state)
-    #     elapsed_time = time.time() - start_time
-    #     steps_per_second = steps_per_eval / elapsed_time
-    #     timestep = (i + 1) * steps_per_eval
-    #
-    #     terminal_mask = episode_statistics.pop("is_terminal_step")
-    #     logger.log_pytree_mask(
-    #         timestep, episode_statistics, terminal_mask, StatisticType.TRAIN
-    #     )
-    #
-    # print("-" * 100)
-    # print(
-    #     f"Step: {(i+1) * steps_per_eval}, Steps per second: {steps_per_second:2f}"
-    # )
-    #
-    # is_terminal_step = episode_statistics.pop("is_terminal_step")
-    #
-    # if not jnp.any(is_terminal_step):
-    #     return None
-    #
-    # episode_statistics = jax.tree_util.tree_map(
-    #     lambda x: x[is_terminal_step], episode_statistics
-    # )
-    #
-    # if episode_statistics is None:
-    #     print("No episode statistics to log")
-    #     return
-    #
-    # print("Episode statistics:")
-    # for key, value in episode_statistics.items():
-    #     print(f"{key}: {jnp.mean(value):2f} {jnp.max(value):2f}")
-    #
-    # start_time = time.time()
-    # eval_statistics = evaluator(learner_state.params.online, eval_keys)
-    # jax.block_until_ready(eval_statistics)
-    # elapsed_time = time.time() - start_time
-    # steps_per_eval_2 = int(jnp.sum(eval_statistics["episode_length"]))
-    # steps_per_second = steps_per_eval_2 / elapsed_time
-    # print()
-    # print("Eval statistics:")
-    # print(f"Steps per second: {steps_per_second:2f}")
-    # for key, value in eval_statistics.items():
-    #     print(f"{key}: {jnp.mean(value):2f} {jnp.max(value):.2f}")
-    # print("-" * 100)
-    # print("-" * 100)
-    # print("-" * 100)
-    #
-
 
 @hydra.main(
-    config_path="/Users/tristan/Projects/lynx/lynx/configs",
+    config_path="../../configs/base/",
     config_name="dqn.yaml",
     version_base="1.2",
 )
@@ -129,11 +71,11 @@ def hydra_entry_point(cfg: DictConfig):
     OmegaConf.set_struct(cfg, False)
 
     # Compute dynamic statistics.
-    cfg = _compute_dynamic_statistics(cfg)
+    # cfg = _compute_dynamic_statistics(cfg)
 
     pprint(OmegaConf.to_container(cfg, resolve=True))
 
-    run_experiment(cfg)
+    # run_experiment(cfg)
 
 
 def _compute_dynamic_statistics(cfg: DictConfig) -> DictConfig:
