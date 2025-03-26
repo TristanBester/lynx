@@ -1,8 +1,11 @@
+import os
+
 import absl.logging as absl_logging
 import jax
 import jax.numpy as jnp
 import numpy as np
 import orbax.checkpoint
+from huggingface_hub import HfApi, snapshot_download
 
 absl_logging.set_verbosity(absl_logging.ERROR)
 
@@ -61,3 +64,31 @@ class Checkpointer:
             self.checkpoint_manager.latest_step()
         )
         return checkpoint["params"]
+
+    def upload_to_hf(self, repo_name: str, folder_path: str):
+        """Upload the checkpoint to Hugging Face."""
+        api = HfApi()
+        api.upload_folder(folder_path=folder_path, repo_id=repo_name)
+
+    def download_from_hf(self, repo_name: str, path_in_repo: str):
+        print(f"Downloading checkpoint from {repo_name} at {path_in_repo}")
+        snapshot_download(
+            repo_id=repo_name,
+            allow_patterns=path_in_repo + "/*",
+            local_dir=".",
+        )
+        print(f"Downloaded checkpoint from {repo_name} at {path_in_repo}")
+
+    def upload_best_to_hf(self, repo_name: str, path_in_repo: str):
+        print(f"Uploading best checkpoint to {repo_name} at {path_in_repo}")
+        checkpoint_path = os.path.join(
+            str(self.checkpoint_manager.directory),
+            str(self.checkpoint_manager.best_step()),
+        )
+        api = HfApi()
+        api.upload_folder(
+            folder_path=checkpoint_path,
+            repo_id=repo_name,
+            path_in_repo=path_in_repo,
+        )
+        print(f"Uploaded best checkpoint to {repo_name} at {path_in_repo}")

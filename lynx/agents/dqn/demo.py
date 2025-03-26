@@ -17,33 +17,44 @@ def main(config):
     # Create the checkpointer
     checkpointer = Checkpointer(
         model_name="dqn-snake",
-        checkpoint_dir=os.path.join(os.getcwd(), "checkpoints"),
-        max_to_keep=5,
-        keep_period=1,
+        # checkpoint_dir=os.path.join(os.getcwd(), "checkpoints"),
+        checkpoint_dir="/Users/tristan/Projects/lynx/checkpoints",
+        max_to_keep=6,
+        keep_period=2,
     )
 
-    params = checkpointer.restore()
+    # checkpointer.upload_best_to_hf(
+    #     repo_name="TristanBester/lynx",
+    #     path_in_repo="checkpoints/dqn/snake",
+    # )
 
-    key = jax.random.PRNGKey(config.experiment.seed)
+    checkpointer.download_from_hf(
+        repo_name="TristanBester/lynx",
+        path_in_repo="checkpoints/dqn/snake",
+    )
 
-    # Setup the environments
-    train_env, eval_env = make(config)
+    # params = checkpointer.restore()
 
-    # Create and initialse the learner
-    key, subkey = jax.random.split(key)
-    learn_fn, eval_network, learner_state = setup_learner(train_env, subkey, config)
+    # key = jax.random.PRNGKey(config.experiment.seed)
 
-    for _ in range(100):
-        key, subkey = jax.random.split(key)
-        state, timestep = eval_env.reset(subkey)
-        eval_env.render(state)
+    # # Setup the environments
+    # train_env, eval_env = make(config)
 
-        while not timestep.last():
-            action_dist = eval_network.apply(params, timestep.observation)
-            action = action_dist.mode()
+    # # Create and initialse the learner
+    # key, subkey = jax.random.split(key)
+    # learn_fn, eval_network, learner_state = setup_learner(train_env, subkey, config)
 
-            state, timestep = eval_env.step(state, action)
-            eval_env.render(state)
+    # for _ in range(100):
+    #     key, subkey = jax.random.split(key)
+    #     state, timestep = eval_env.reset(subkey)
+    #     eval_env.render(state)
+
+    #     while not timestep.last():
+    #         action_dist = eval_network.apply(params, timestep.observation)
+    #         action = action_dist.mode()
+
+    #         state, timestep = eval_env.step(state, action)
+    #         eval_env.render(state)
 
 
 if __name__ == "__main__":

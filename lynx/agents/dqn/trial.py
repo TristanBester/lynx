@@ -49,6 +49,7 @@ def _compute_dynamic_statistics(cfg: DictConfig) -> DictConfig:
 
     if dynamic.rollouts_per_eval == 0:
         # TODO: Handle elegantly
+        # FIXME: Handle elegantly
         dynamic.rollouts_per_eval = 1
 
     dynamic.steps_per_eval = dynamic.steps_per_rollout * dynamic.rollouts_per_eval
