@@ -3,8 +3,9 @@ from enum import Enum
 import chex
 import jax
 import jax.numpy as jnp
-import wandb
 from dotenv import load_dotenv
+
+import wandb
 
 load_dotenv()
 

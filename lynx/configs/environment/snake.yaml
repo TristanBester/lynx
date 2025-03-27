@@ -3,5 +3,5 @@
   kwargs:
     num_rows: 6
     num_cols: 6 
-  wrappers:
-    _target_: lynx.envs.wrappers.observation.flatten.FlattenObservationWrapper
+  agent_view_transformer:
+    _target_: lynx.envs.wrappers.jumanji.transformers.snake.SnakeAgentViewTransformer

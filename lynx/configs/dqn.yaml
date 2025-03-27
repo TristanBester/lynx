@@ -29,14 +29,16 @@ network:
   head:
     _target_: lynx.networks.heads.QNetworkHead 
 environment:
-  name: Snake-v1
-  observation_attribute: grid 
-  kwargs:
-    num_rows: 6
-    num_cols: 6 
-  wrappers:
-    _target_: lynx.envs.wrappers.observation.flatten.FlattenObservationWrapper
-
+  # name: Snake-v1
+  # observation_attribute: grid 
+  # kwargs:
+  #   num_rows: 6
+  #   num_cols: 6 
+  # agent_view_transformer:
+  #   _target_: lynx.envs.wrappers.jumanji.transformers.snake.SnakeAgentViewTransformer
+  name: SlidingTilePuzzle-v0
+  agent_view_transformer:
+    _target_: lynx.envs.wrappers.jumanji.transformers.puzzle.PuzzleAgentViewTransformer
 defaults:  
   - _self_  
   - override hydra/hydra_logging: disabled  

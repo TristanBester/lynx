@@ -9,6 +9,7 @@ from rich.pretty import pprint
 from lynx.agents.dqn.evaluator import setup_evaluator
 from lynx.agents.dqn.learner.setup import setup_learner
 from lynx.envs.factories.factory import make
+
 # from lynx.logger.logger import LogAggregator, StatisticType
 
 

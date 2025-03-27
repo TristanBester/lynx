@@ -8,7 +8,7 @@ from jumanji.registration import _REGISTRY as JUMANJI_REGISTRY
 from jumanji.wrappers import AutoResetWrapper
 from omegaconf import DictConfig
 
-from lynx.envs.wrappers.conversion.jumanji import JumanjiWrapper
+from lynx.envs.wrappers.jumanji.base import JumanjiWrapper
 from lynx.envs.wrappers.logging.episode import RecordEpisodeMetrics
 
 
@@ -28,16 +28,25 @@ def make_jumanji_env(
     # Config generator and select the wrapper.
 
     # Create envs.
-    env_kwargs = dict(copy.deepcopy(config.environment.kwargs))
-    if "generator" in env_kwargs:
-        generator = env_kwargs.pop("generator")
-        generator = hydra.utils.instantiate(generator)
-        env_kwargs["generator"] = generator
-    env = jumanji.make(env_name, **env_kwargs)
-    eval_env = jumanji.make(env_name, **env_kwargs)
+
+    env_kwargs = config.environment.get("kwargs", {})
+
+    # env_kwargs = dict(copy.deepcopy(config.environment.kwargs))
+    # if "generator" in env_kwargs:
+    #     generator = env_kwargs.pop("generator")
+    #     generator = hydra.utils.instantiate(generator)
+    #     env_kwargs["generator"] = generator
+    #
+
+    env = jumanji.make(env_name, **env_kwargs)  # type: ignore
+    eval_env = jumanji.make(env_name, **env_kwargs)  # type: ignore
+
+    agent_view_transformer = hydra.utils.instantiate(
+        config.environment.agent_view_transformer
+    )
     env, eval_env = (
-        JumanjiWrapper(env, config.environment.observation_attribute),
-        JumanjiWrapper(eval_env, config.environment.observation_attribute),
+        JumanjiWrapper(env, agent_view_transformer=agent_view_transformer),
+        JumanjiWrapper(eval_env, agent_view_transformer=agent_view_transformer),
     )
 
     env = AutoResetWrapper(env, next_obs_in_extras=True)
