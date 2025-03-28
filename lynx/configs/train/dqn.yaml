@@ -7,15 +7,15 @@ eval:
 hparams:
   envs_per_device: 1024
   updates_per_device: 1 # Number of gradient updates per device
-  rollout_length: 2 # Number of steps in a rollout per vectorised environment
+  rollout_length: 47 # Number of steps in a rollout per vectorised environment
   updates_per_epoch: 5 # Number of gradients updates per epoch
   warmup_steps: 100 # Number of environment steps to take before training starts
   buffer_size: 1_000_000 # Size of the replay buffer 
-  batch_size: 1677 # Batch size used by each device 
-  learning_rate: 0.00043140304430580936
-  tau: 0.005
+  batch_size: 7817 # Batch size used by each device 
+  learning_rate: 0.0005329690735745034
+  tau: 0.00038288616502262423
   gamma: 0.99 
   max_grad_norm: 0.5 # Maximum norm of the gradients for a weight update
-  training_epsilon: 0.02299153384564246 # Epsilon used for training
+  training_epsilon: 0.2490271210126609 # Epsilon used for training
   max_abs_reward: 1000.0
-  huber_loss_parameter: 0.7449714991924178
+  huber_loss_parameter: 0.8640491929269714

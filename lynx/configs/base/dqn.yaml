@@ -1,9 +1,9 @@
 defaults:  
   - _self_  
-  # - run_type: train # What to do with all this config
   - environment: puzzle 
   - network: dqn
   - train: dqn 
+  - logger: wandb
   - override hydra/hydra_logging: disabled  
   - override hydra/job_logging: disabled  
 
