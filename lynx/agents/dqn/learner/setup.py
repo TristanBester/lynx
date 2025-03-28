@@ -75,7 +75,7 @@ def _setup_networks(env: Environment, key: chex.PRNGKey, config: DictConfig):
     train_q_network_head = hydra.utils.instantiate(
         config.network.head,
         action_dim=env.action_spec.num_values,
-        epsilon=config.train.training_epsilon,
+        epsilon=config.train.hparams.training_epsilon,
     )
     eval_q_network_head = hydra.utils.instantiate(
         config.network.head,
@@ -106,8 +106,8 @@ def _setup_networks(env: Environment, key: chex.PRNGKey, config: DictConfig):
 
 def _setup_optimiser(params: OnlineAndTarget, config: DictConfig):
     optim = optax.chain(
-        optax.clip_by_global_norm(config.train.max_grad_norm),
-        optax.adam(config.train.learning_rate, eps=1e-5),
+        optax.clip_by_global_norm(config.train.hparams.max_grad_norm),
+        optax.adam(config.train.hparams.learning_rate, eps=1e-5),
     )
     optim_state = optim.init(params.online)
     return optim, optim_state
@@ -115,9 +115,9 @@ def _setup_optimiser(params: OnlineAndTarget, config: DictConfig):
 
 def _setup_buffer(env: Environment, config: DictConfig):
     buffer = fbx.make_item_buffer(
-        max_length=config.train.buffer_size,
-        min_length=config.train.batch_size,
-        sample_batch_size=config.train.batch_size,
+        max_length=config.train.hparams.buffer_size,
+        min_length=config.train.hparams.batch_size,
+        sample_batch_size=config.train.hparams.batch_size,
         add_batches=True,
         add_sequences=True,
     )
@@ -151,8 +151,8 @@ def _reset_pmap(key, env, config):
     key, *env_keys = jax.random.split(
         key,
         jax.device_count()
-        * config.train.updates_per_device
-        * config.train.envs_per_device
+        * config.train.hparams.updates_per_device
+        * config.train.hparams.envs_per_device
         + 1,
     )
     env_states, timesteps = jax.vmap(env.reset, in_axes=(0))(
@@ -163,8 +163,8 @@ def _reset_pmap(key, env, config):
         return x.reshape(
             (
                 jax.device_count(),
-                config.train.updates_per_device,
-                config.train.envs_per_device,
+                config.train.hparams.updates_per_device,
+                config.train.hparams.envs_per_device,
             )
             + x.shape[1:]
         )
@@ -184,7 +184,7 @@ def _replicate_params_across_batches_and_devices(params, config):
     """
 
     def broadcast(x: chex.Array) -> chex.Array:
-        return jnp.broadcast_to(x, (config.train.updates_per_device,) + x.shape)
+        return jnp.broadcast_to(x, (config.train.hparams.updates_per_device,) + x.shape)
 
     batch_replicated_params = jax.tree_util.tree_map(broadcast, params)
     device_batch_replicated_params = flax.jax_utils.replicate(  # type: ignore
@@ -195,7 +195,7 @@ def _replicate_params_across_batches_and_devices(params, config):
 
 def _replicate_opt_state_across_batches_and_devices(opt_state, config):
     def broadcast(x: chex.Array) -> chex.Array:
-        return jnp.broadcast_to(x, (config.train.updates_per_device,) + x.shape)
+        return jnp.broadcast_to(x, (config.train.hparams.updates_per_device,) + x.shape)
 
     batch_replicated_opt_state = jax.tree_util.tree_map(broadcast, opt_state)
     device_batch_replicated_opt_state = flax.jax_utils.replicate(  # type: ignore
@@ -206,7 +206,7 @@ def _replicate_opt_state_across_batches_and_devices(opt_state, config):
 
 def _replicate_buffer_state_across_batches_and_devices(buffer_state, config):
     def broadcast(x: chex.Array) -> chex.Array:
-        return jnp.broadcast_to(x, (config.train.updates_per_device,) + x.shape)
+        return jnp.broadcast_to(x, (config.train.hparams.updates_per_device,) + x.shape)
 
     batch_replicated_buffer_state = jax.tree_util.tree_map(broadcast, buffer_state)
     device_batch_replicated_buffer_state = flax.jax_utils.replicate(  # type: ignore
@@ -218,10 +218,10 @@ def _replicate_buffer_state_across_batches_and_devices(buffer_state, config):
 def _get_batch_device_keys(key, config):
     def reshape_keys(x: chex.Array) -> chex.Array:
         return x.reshape(
-            (jax.device_count(), config.train.updates_per_device) + x.shape[1:]
+            (jax.device_count(), config.train.hparams.updates_per_device) + x.shape[1:]
         )
 
     batch_device_keys = jax.random.split(
-        key, jax.device_count() * config.train.updates_per_device
+        key, jax.device_count() * config.train.hparams.updates_per_device
     )
     return reshape_keys(jnp.stack(batch_device_keys))

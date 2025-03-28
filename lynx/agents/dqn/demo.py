@@ -1,6 +1,5 @@
 import hydra
 import jax
-from jax._src.lax.lax import tie_in
 
 from lynx.envs.factories.factory import make
 

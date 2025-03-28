@@ -1,7 +1,6 @@
-  name: Snake-v1
-  observation_attribute: grid 
-  kwargs:
-    num_rows: 6
-    num_cols: 6 
-  agent_view_transformer:
-    _target_: lynx.envs.wrappers.jumanji.transformers.snake.SnakeAgentViewTransformer
+name: Snake-v1
+kwargs:
+  num_rows: 6
+  num_cols: 6 
+agent_view_transformer:
+  _target_: lynx.envs.wrappers.jumanji.transformers.snake.SnakeAgentViewTransformer

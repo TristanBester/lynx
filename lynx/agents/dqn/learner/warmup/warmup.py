@@ -25,7 +25,10 @@ def setup_warmup_fn(
 
         # STEP ENVIRONMENT FOR ROLLOUT LENGTH
         (env_states, timesteps, keys), traj_batch = jax.lax.scan(
-            step_env, (env_states, timesteps, key), None, config.train.warmup_steps
+            step_env,
+            (env_states, timesteps, key),
+            None,
+            config.train.hparams.warmup_steps,
         )
 
         # Add the trajectory to the buffer.

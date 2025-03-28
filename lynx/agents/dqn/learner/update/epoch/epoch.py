@@ -44,7 +44,7 @@ def create_update_epoch_fn(
         q_new_online_params = optax.apply_updates(params.online, q_updates)
         # Target network polyak update.
         new_target_q_params = optax.incremental_update(
-            q_new_online_params, params.target, config.train.tau
+            q_new_online_params, params.target, config.train.hparams.tau
         )
         q_new_params = OnlineAndTarget(q_new_online_params, new_target_q_params)
 

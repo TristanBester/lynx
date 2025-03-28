@@ -5,9 +5,10 @@ mkdir -p /home-mscluster/tbester/lynx/slurm_logs/out
 # Setup the environment
 cd /home-mscluster/tbester/lynx
 uv sync 
+uv add "jax[cuda12]"
 
-# Copy batch scripts into project root 
-cp /home-mscluster/tbester/lynx/lynx/sweep/batch_script.sh .
+# Change to the batch directory
+cd /home-mscluster/tbester/lynx/.lynx/batch
 
 # Start the agents 
 sbatch batch_script.sh 

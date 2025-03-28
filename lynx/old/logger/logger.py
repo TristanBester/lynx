@@ -19,6 +19,7 @@ class StatisticType(Enum):
 class LogAggregator:
     def __init__(self, project_name: str | None = None):
         self.log_backends = [WandbBackend(project_name=project_name)]
+        # self.log_backends = [ConsoleBackend()]
         self.summary_statistics = {
             "mean": jnp.mean,
             "max": jnp.max,
@@ -62,6 +63,10 @@ class LogAggregator:
         mask: chex.Array,
         statistic_type: StatisticType,
     ):
+        if not jnp.any(mask):
+            print("WARNING: No episodes completed...")
+            return
+
         masked_statistics = jax.tree_util.tree_map(lambda x: x[mask], statistics)
 
         # Compile statistics

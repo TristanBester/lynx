@@ -20,7 +20,7 @@ def setup_learn_fn(env: Environment, apply_fn, update_fn, buffer, config):
             batch_update_fn,
             learner_state,
             None,
-            length=config.train.updates_per_epoch,
+            length=config.train.hparams.updates_per_epoch,
         )
         return learner_state, episode_statistics, training_statistics
 

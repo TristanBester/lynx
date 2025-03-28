@@ -3,12 +3,12 @@ from typing import Tuple
 
 import chex
 import jax.numpy as jnp
+
 from jumanji import specs
 from jumanji.env import Environment, State
 from jumanji.specs import Array, Spec
 from jumanji.types import TimeStep
 from jumanji.wrappers import Wrapper
-
 from lynx.types.types import Observation
 
 

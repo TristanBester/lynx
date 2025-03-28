@@ -22,7 +22,7 @@ def create_evaluator(env, param_fn, act_fn, config):
             axis_name="batch",
         )
 
-        eval_batch = (config.eval.num_episodes // jax.device_count()) * 1
+        eval_batch = (config.train.eval.num_episodes // jax.device_count()) * 1
         eval_keys = jnp.stack(jax.random.split(key, eval_batch))
         eval_keys = eval_keys.reshape(eval_batch, -1)
 

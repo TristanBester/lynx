@@ -21,11 +21,11 @@ def create_batch_loss_fn(
 
         # Cast and clip rewards.
         discount = 1.0 - transitions.done.astype(jnp.float32)
-        d_t = (discount * config.train.gamma).astype(jnp.float32)
+        d_t = (discount * config.train.hparams.gamma).astype(jnp.float32)
         r_t = jnp.clip(
             transitions.reward,
-            -config.train.max_abs_reward,
-            config.train.max_abs_reward,
+            -config.train.hparams.max_abs_reward,
+            config.train.hparams.max_abs_reward,
         ).astype(jnp.float32)
         a_tm1 = transitions.action
 
@@ -36,7 +36,7 @@ def create_batch_loss_fn(
             r_t,
             d_t,
             q_t,
-            config.train.huber_loss_parameter,
+            config.train.hparams.huber_loss_parameter,
         )
 
         loss_info = {

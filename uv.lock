@@ -707,6 +707,7 @@ source = { editable = "." }
 dependencies = [
     { name = "carbs" },
     { name = "chex" },
+    { name = "click" },
     { name = "distrax" },
     { name = "fabric" },
     { name = "flashbax" },
@@ -734,6 +735,7 @@ dev = [
 requires-dist = [
     { name = "carbs", git = "https://github.com/imbue-ai/carbs.git" },
     { name = "chex", specifier = ">=0.1.89" },
+    { name = "click", specifier = ">=8.1.8" },
     { name = "distrax", specifier = ">=0.1.5" },
     { name = "fabric", specifier = ">=3.2.2" },
     { name = "flashbax", specifier = ">=0.1.2" },

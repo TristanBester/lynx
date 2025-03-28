@@ -1,0 +1,136 @@
+import time
+
+import hydra
+import jax
+import jax.numpy as jnp
+from omegaconf import DictConfig, OmegaConf
+from rich.pretty import pprint
+
+from lynx.agents.dqn.evaluator import setup_evaluator
+from lynx.agents.dqn.learner.setup import setup_learner
+
+# from lynx.checkpoint import Checkpointer
+from lynx.envs.factories.factory import make
+from lynx.old.logger.logger import LogAggregator, StatisticType
+
+
+def run_experiment(config):
+    key = jax.random.PRNGKey(config.train.config.seed)
+
+    # Setup the environments
+    train_env, eval_env = make(config)
+
+    # Create and initialse the learner
+    key, subkey = jax.random.split(key)
+    learn_fn, eval_network, learner_state = setup_learner(train_env, subkey, config)
+
+    # Create and initialise the evaluator
+    key, subkey = jax.random.split(key)
+    evaluator, eval_keys = setup_evaluator(eval_env, eval_network.apply, subkey, config)
+
+    # Create the logger
+    logger = LogAggregator(project_name="lynx-snake")
+
+    # Create the checkpointer
+    # checkpointer = Checkpointer(
+    #     model_name=f"dqn-snake-{config.experiment.seed}",
+    #     checkpoint_dir=os.path.join(
+    #         os.getcwd(), f"checkpoints/seed-{config.experiment.seed}"
+    #     ),
+    #     max_to_keep=2,
+    #     # keep_period=config.dynamic.steps_per_eval,
+    #     keep_period=100_000,  # FIXME: Random number so mod fails and not all stored
+    # )
+
+    timestep = 0
+    for _ in range(config.dynamic.eval_count):
+        for _ in range(config.dynamic.rollouts_per_eval):
+            print("Rollout started...")
+            start_time = time.time()
+            learner_state, episode_statistics, training_statistics = learn_fn(
+                learner_state
+            )
+            jax.block_until_ready(learner_state)
+            elapsed_time = time.time() - start_time
+
+            steps_per_second = config.dynamic.steps_per_rollout / elapsed_time
+            timestep += config.dynamic.steps_per_rollout
+
+            terminal_mask = episode_statistics.pop("is_terminal_step")
+            logger.log_pytree_mask(
+                timestep, episode_statistics, terminal_mask, StatisticType.TRAIN
+            )
+            logger.log_pytree(timestep, training_statistics, StatisticType.OPT)
+            logger.log_scalar(
+                timestep, "steps_per_second", steps_per_second, StatisticType.TRAIN
+            )
+
+        print("Evaluation started...")
+        start_time = time.time()
+        eval_statistics = evaluator(learner_state.params.online, eval_keys)
+        jax.block_until_ready(eval_statistics)
+        elapsed_time = time.time() - start_time
+
+        eval_steps = int(jnp.sum(eval_statistics["episode_length"]))
+        steps_per_second = eval_steps / elapsed_time
+
+        logger.log_pytree(timestep, eval_statistics, StatisticType.EVAL)
+        logger.log_scalar(
+            timestep, "steps_per_second", steps_per_second, StatisticType.EVAL
+        )
+
+        # print("Saving checkpoint...")
+        # checkpointer.save(
+        #     step=timestep,
+        #     params=learner_state.params.online,
+        #     eval_episode_return=jnp.mean(eval_statistics["episode_return"]),
+        # )
+
+
+@hydra.main(
+    config_path="../../configs/base",
+    config_name="dqn.yaml",
+    version_base="1.2",
+)
+def hydra_entry_point(cfg: DictConfig):
+    """Experiment entry point."""
+    # Allow dynamic attributes.
+    OmegaConf.set_struct(cfg, False)
+
+    # Compute dynamic statistics.
+    cfg = _compute_dynamic_statistics(cfg)
+    pprint(OmegaConf.to_container(cfg, resolve=True))
+
+    run_experiment(cfg)
+
+
+def _compute_dynamic_statistics(cfg: DictConfig) -> DictConfig:
+    dynamic = OmegaConf.create()
+
+    dynamic.device_count = jax.device_count()
+    dynamic.steps_per_rollout = (
+        dynamic.device_count
+        * cfg.train.hparams.envs_per_device
+        * cfg.train.hparams.rollout_length
+    )
+    dynamic.rollouts_per_eval = (
+        cfg.train.eval.desired_steps_per_eval // dynamic.steps_per_rollout
+    )
+
+    if dynamic.rollouts_per_eval == 0:
+        # TODO: Handle elegantly
+        dynamic.rollouts_per_eval = 1
+
+    dynamic.steps_per_eval = dynamic.steps_per_rollout * dynamic.rollouts_per_eval
+    dynamic.updates_per_eval = (
+        cfg.train.hparams.updates_per_epoch * dynamic.rollouts_per_eval
+    )
+
+    dynamic.eval_count = cfg.train.config.total_steps // dynamic.steps_per_eval
+
+    cfg.dynamic = dynamic
+    return cfg
+
+
+if __name__ == "__main__":
+    hydra_entry_point()
