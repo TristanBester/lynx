@@ -23,9 +23,9 @@ def hydra_entry_point(cfg: DictConfig):
 
     # Create the checkpointer
     checkpointer = Checkpointer(
-        model_name=f"dqn-snake-{config.train.experiment.seed}",
+        model_name=f"dqn-snake-{config.train.config.seed}",
         checkpoint_dir=os.path.join(
-            os.getcwd(), f"checkpoints/seed-{config.train.experiment.seed}"
+            os.getcwd(), f"checkpoints/seed-{config.train.config.seed}"
         ),
         max_to_keep=1,
         # keep_period=config.dynamic.steps_per_eval,

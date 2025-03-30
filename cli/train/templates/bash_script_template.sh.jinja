@@ -1,0 +1,16 @@
+#!/bin/bash
+mkdir -p {{ remote_project_dir }}/slurm_logs/err 
+mkdir -p {{ remote_project_dir }}/slurm_logs/out 
+
+# Setup the environment
+cd {{ remote_project_dir }}
+uv sync 
+uv add "jax[cuda12]"
+
+# Change to the batch directory
+cd {{ remote_project_dir }}/.lynx/train
+
+# Start the agents 
+{% for _ in range(node_count) -%}
+sbatch batch_script.sh 
+{% endfor -%}

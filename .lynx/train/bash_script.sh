@@ -8,16 +8,7 @@ uv sync
 uv add "jax[cuda12]"
 
 # Change to the batch directory
-cd /home-mscluster/tbester/lynx/.lynx/batch
+cd /home-mscluster/tbester/lynx/.lynx/train
 
 # Start the agents 
-sbatch batch_script.sh 
-sbatch batch_script.sh 
-sbatch batch_script.sh 
-sbatch batch_script.sh 
-sbatch batch_script.sh 
-sbatch batch_script.sh 
-sbatch batch_script.sh 
-sbatch batch_script.sh 
-sbatch batch_script.sh 
 sbatch batch_script.sh 

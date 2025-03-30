@@ -8,7 +8,7 @@ hparams:
   envs_per_device: 1024
   updates_per_device: 1 # Number of gradient updates per device
   rollout_length: 47 # Number of steps in a rollout per vectorised environment
-  updates_per_epoch: 5 # Number of gradients updates per epoch
+  updates_per_epoch: 246 # Number of gradients updates per epoch
   warmup_steps: 100 # Number of environment steps to take before training starts
   buffer_size: 1_000_000 # Size of the replay buffer 
   batch_size: 7817 # Batch size used by each device 

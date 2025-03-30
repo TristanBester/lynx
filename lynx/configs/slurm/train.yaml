@@ -1,0 +1,7 @@
+partition: bigbatch
+time_limit: "72:00:00"
+job_name: dqn-train 
+remote_project_dir: /home-mscluster/tbester/lynx
+entity: tristanbester1
+node_count: 1
+agents_per_node: 1

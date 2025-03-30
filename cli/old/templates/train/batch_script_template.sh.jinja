@@ -1,16 +1,16 @@
 #!/bin/bash
 # specify a partition
-#SBATCH -p bigbatch 
+#SBATCH -p {{ partition }} 
 # specify number of nodes
 #SBATCH -N 1
 # specify the wall clock time limit for the job hh:mm:ss
-#SBATCH -t 72:00:00 
+#SBATCH -t {{ time_limit }} 
 # specify the job name
-#SBATCH -J snake-sweep
+#SBATCH -J {{ job_name }}
 # specify the filename to be used for writing output
-#SBATCH -o /home-mscluster/tbester/lynx/slurm_logs/out/out_file.%N.%j.out
+#SBATCH -o {{ remote_project_dir }}/slurm_logs/out/out_file.%N.%j.out
 # specify the filename for stderr
-#SBATCH -e /home-mscluster/tbester/lynx/slurm_logs/err/error_file.%N.%j.err
+#SBATCH -e {{ remote_project_dir }}/slurm_logs/err/error_file.%N.%j.err
 
 # Get the hostname of the current machine
 HOSTNAME=$(hostname)
@@ -22,10 +22,12 @@ if [[ "$HOSTNAME" == *"login"* ]]; then
 fi
 
 # Change to the remote project directory
-cd "/home-mscluster/tbester/lynx"
+cd "{{ remote_project_dir }}"
 uv sync
 source .venv/bin/activate
 
 # Run multiple W&B agents in parallel
-wandb agent tristanbester1/sweep-dqn-puzzle/b5grgq9w &
+{% for i in range(agents_per_node) -%}
+wandb agent {{ entity }}/{{ project }}/{{ sweep_id }} &
+{% endfor -%}
 wait;
